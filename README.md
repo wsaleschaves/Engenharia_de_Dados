@@ -1,101 +1,191 @@
-# Engenharia_de_Dados
+# 📊 MVP – Engenharia de Dados  
+## Análise das Bolsas do Prouni no Brasil (2005–2019)
 
-Análise de Bolsas do Prouni no Brasil
+Este repositório apresenta um **MVP (Minimum Viable Product) de Engenharia de Dados**, cujo objetivo é a construção de um **pipeline de dados em nuvem**, utilizando **Databricks, Apache Spark, Delta Lake e modelagem dimensional**, para análise das bolsas concedidas pelo **Programa Universidade para Todos (Prouni)**.
 
-Este repositório apresenta um MVP (Minimum Viable Product) de Engenharia de Dados, desenvolvido com foco na construção de um pipeline de dados em arquitetura Lakehouse, utilizando Databricks, Apache Spark, Delta Lake e modelagem dimensional (Esquema Estrela) para análise das bolsas concedidas pelo Programa Universidade para Todos (Prouni).
-O projeto cobre todo o ciclo de dados: ingestão, tratamento, padronização, modelagem, governança e análise, culminando em uma camada analítica otimizada para Business Intelligence e análises exploratórias.
+O projeto cobre todo o ciclo de dados — da ingestão à análise — seguindo a **arquitetura Medallion (Bronze, Silver e Gold)** e entregando uma **camada analítica confiável e otimizada para BI**.
 
-1. Objetivo do Projeto
+---
 
-O objetivo principal deste MVP é construir um pipeline de dados robusto e reprodutível capaz de consolidar e analisar os dados do Prouni, proporcionando uma visão estruturada sobre a concessão de bolsas de estudo no Brasil.
+## 🎯 1. Objetivo do Projeto
 
-O pipeline foi desenhado para:
-Ingerir dados públicos em formato bruto
-Tratar e padronizar informações inconsistentes
-Modelar os dados em um esquema estrela
-Disponibilizar uma camada analítica confiável (Gold)
-Permitir análises históricas, demográficas e regionais
+O objetivo deste MVP é **consolidar, tratar, padronizar e analisar** os dados do Prouni, resolvendo o problema da **ausência de uma visão integrada e estruturada** sobre o comportamento das bolsas concedidas no Brasil.
 
-Problema de Negócio
-Os dados do Prouni, apesar de públicos, não estão prontos para análise direta, pois apresentam:
-Fragmentação por entidades
-Inconsistências de texto e categorias
-Problemas de duplicidade
-Datas em múltiplos formatos
-Ausência de um modelo analítico estruturado
-Este MVP resolve esse problema ao entregar um Data Lakehouse organizado, preparado para responder perguntas estratégicas sobre o acesso ao ensino superior no Brasil.
+O pipeline contempla:
 
-Perguntas Analíticas Respondidas
+- Ingestão de dados brutos  
+- Limpeza e padronização  
+- Modelagem dimensional (Esquema Estrela)  
+- Criação de dimensões e tabela fato  
+- Disponibilização de dados para análises e BI  
 
-O projeto foi estruturado para responder, entre outras, as seguintes perguntas:
-Qual o volume total de bolsas concedidas ao longo dos anos?
-Quais cursos recebem mais bolsas?
-Como as bolsas se distribuem por região, estado e município?
-Qual o perfil dos beneficiários (sexo, raça/cor, idade)?
-Quais instituições concentram o maior número de bolsas?
-Qual a proporção entre bolsas integrais e parciais?
-Existe tendência de crescimento ou redução nas concessões ao longo do tempo?
+### Perguntas Analíticas Respondidas
 
-1.1 Resultados Esperados
+- Qual o volume total de bolsas concedidas ao longo dos anos?
+- Quais cursos recebem mais bolsas?
+- Como as bolsas se distribuem por região, estado e município?
+- Qual o perfil dos beneficiários (sexo, raça/cor e idade)?
+- Quais instituições concentram o maior número de bolsas?
+- Qual a proporção entre bolsas integrais e parciais?
+- Há tendência de crescimento ou redução nas concessões ao longo do tempo?
+
+---
+
+## ✅ 1.1 Resultados Esperados
 
 Ao final do projeto, são entregues:
-Um Lakehouse confiável com camadas Bronze → Silver → Gold
-Um modelo dimensional completo (Esquema Estrela)
-Tabela fato e dimensões com surrogate keys
-Dados padronizados e prontos para consumo por BI
-Base sólida para análises exploratórias e dashboards
-Insights sobre políticas públicas e acesso ao ensino superior
 
-2. Fonte dos Dados e Coleta
+- Um **Lakehouse confiável** com camadas Bronze → Silver → Gold  
+- Um **modelo estrela completo**, com tabela fato e dimensões usando surrogate keys  
+- Dados padronizados e prontos para consumo via BI e análises exploratórias  
+- Insights sobre o acesso ao ensino superior e políticas educacionais  
 
-Os dados utilizados são públicos e abertos, sem restrições de confidencialidade, contendo informações sobre bolsas concedidas pelo Prouni entre 2005 e 2019.
+---
 
-📌 Fonte Principal
+## 🌐 2. Fonte dos Dados
 
-Kaggle – Brasil Students Scholarship (Prouni) 2005–2019
-🔗 https://www.kaggle.com/datasets/lfarhat/brasil-students-scholarship-prouni-20052019
+Os dados utilizados são **públicos e abertos**, sem restrições de confidencialidade.
 
-Características da Base
-Arquivo CSV consolidado
-Milhões de registros
-Informações sobre:
-Tipo de bolsa (integral/parcial)
-Curso
-Instituição
-Turno
-Localização
-Perfil do beneficiário
+- **Fonte:** Kaggle – *Brasil Students Scholarship (Prouni) 2005–2019*  
+- 🔗 https://www.kaggle.com/datasets/lfarhat/brasil-students-scholarship-prouni-20052019  
 
-2.1 Tabela Fato – Prouni
+A base consiste em arquivos CSV consolidados contendo milhões de registros com informações sobre:
 
-A tabela fato do projeto, denominada fato_prouni_gold, representa o evento central do modelo: a concessão de uma bolsa.
+- Tipo de bolsa  
+- Curso  
+- Instituição  
+- Localização  
+- Perfil do beneficiário  
 
-Ela consolida informações como:
-Ano da concessão
-Instituição de ensino
-Curso
-Tipo de bolsa
-Turno
-Localização do beneficiário
-Perfil demográfico do aluno
-Cada linha da tabela fato corresponde a uma bolsa concedida, permitindo análises temporais, regionais e demográficas.
+---
 
-2.2 Dimensões e Surrogate Keys
+## 🧱 3. Arquitetura do Pipeline (Medallion)
 
-Na camada Gold, foram criadas dimensões independentes, cada uma com sua surrogate key (cod_*), garantindo:
+O pipeline foi desenvolvido seguindo a **arquitetura Medallion**, garantindo governança, rastreabilidade e qualidade dos dados.
 
-Integridade referencial
-Melhor performance de consultas
-Redução de redundância
-Facilidade de manutenção
+### 🥉 Bronze – Dados Brutos
+- Armazena os dados exatamente como recebidos da fonte  
+- Sem transformações  
+- Serve como backup histórico e base para auditorias  
 
-Dimensões Criadas
-dim_instituicao_gold
-dim_curso_gold
-dim_tipo_bolsa_gold
-dim_turno_gold
-dim_localizacao_gold
-dim_beneficiario_gold
-dim_tempo_gold
+### 🥈 Silver – Dados Refinados
+- Padronização de textos  
+- Correção de tipos de dados  
+- Tratamento de datas  
+- Remoção de duplicatas  
+- Normalização de categorias  
 
-Todas as dimensões são derivadas da camada Silver, já tratadas e padronizadas.
+### 🥇 Gold – Camada Analítica
+- Modelo dimensional (Esquema Estrela)  
+- Tabela fato + dimensões  
+- Dados prontos para análises e BI  
+
+---
+
+## 📐 4. Modelagem Dimensional
+
+Foi aplicada **modelagem dimensional em Esquema Estrela**, amplamente utilizada em projetos de BI por sua eficiência analítica e simplicidade de consultas.
+
+### 📊 Tabela Fato – `fato_prouni_gold`
+
+Cada linha representa **uma bolsa concedida**, contendo:
+
+- Ano da concessão  
+- Chaves substitutas das dimensões  
+- Informações institucionais, acadêmicas e do beneficiário  
+
+### 📊 Dimensões Criadas
+
+- `dim_instituicao_gold`
+- `dim_curso_gold`
+- `dim_tipo_bolsa_gold`
+- `dim_turno_gold`
+- `dim_localizacao_gold`
+- `dim_beneficiario_gold`
+- `dim_tempo_gold`
+
+Todas as dimensões utilizam **surrogate keys (cod_*)**, garantindo:
+
+- Integridade referencial  
+- Melhor performance  
+- Redução de redundância  
+- Facilidade de manutenção  
+
+---
+
+## 📚 5. Catálogo de Dados (Resumo)
+
+**Tabela Fato – `fato_prouni_gold`**
+- Ano da concessão  
+- Códigos das dimensões  
+- Base para todas as métricas e análises  
+
+**Dimensões**
+- Instituição: dados da IES  
+- Curso: nome e padronização  
+- Tipo de bolsa: integral ou parcial  
+- Turno: modalidade de horário  
+- Localização: região, UF e município  
+- Beneficiário: sexo, raça, idade e nascimento  
+- Tempo: anos analisados  
+
+---
+
+## 🧪 6. Qualidade e Governança dos Dados
+
+Durante o ETL foram tratados diversos problemas de qualidade:
+
+- Padronização de textos (maiúsculas, acentuação, espaços)  
+- Correção de datas em múltiplos formatos  
+- Tratamento de valores inválidos e inesperados  
+- Remoção de duplicatas em dimensões e fato  
+- Tratamento consciente de valores nulos  
+- Validação de integridade antes da carga na Gold  
+
+Essas etapas garantiram **consistência, confiabilidade e robustez** dos dados finais.
+
+---
+
+## 📊 7. Análises e Principais Resultados
+
+### 🔹 Evolução das Bolsas ao Longo do Tempo
+- Tendência inicial de crescimento  
+- Oscilações relacionadas a contexto econômico e políticas públicas  
+- Atenção à incompletude dos anos mais recentes  
+
+### 🔹 Cursos com Mais Bolsas
+- Forte concentração em cursos como:
+  - Administração  
+  - Pedagogia  
+  - Direito  
+  - Enfermagem  
+
+### 🔹 Distribuição Geográfica
+- Concentração em regiões mais populosas  
+- Forte presença em grandes centros urbanos  
+
+### 🔹 Perfil dos Beneficiários
+- Predominância de jovens entre 18 e 39 anos  
+- Maior participação feminina  
+- Maior concentração entre beneficiários pardos e pretos  
+
+### 🔹 Instituições
+- Concentração em instituições privadas de grande porte  
+
+### 🔹 Tipo de Bolsa
+- Predominância de bolsas integrais  
+- Reforço do caráter social do programa  
+
+---
+
+## 🏁 8. Atingimento dos Objetivos
+
+Todos os objetivos definidos no início do projeto foram **plenamente atingidos**. O pipeline construído possibilitou análises estruturadas, confiáveis e reprodutíveis, respondendo às perguntas analíticas propostas.
+
+---
+
+## 🚀 9. Conclusão
+
+Este MVP demonstra a aplicação prática de conceitos de **Engenharia de Dados** em um cenário real de política pública, entregando uma base analítica robusta e preparada para BI e análises avançadas.
+
+O projeto consolida conhecimentos teóricos por meio de uma solução escalável, organizada e alinhada às melhores práticas do mercado.
